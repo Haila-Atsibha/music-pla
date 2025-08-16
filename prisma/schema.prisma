@@ -9,16 +9,19 @@ datasource db {
 }
 
 model User {
-  id         String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  auth_uid   String        @unique
-  email      String        @unique
-  name       String?
-  role       String        @default("user")
-  created_at DateTime      @default(now()) @db.Timestamptz(6)
-  playlists  Playlist[]
-  likes      UserLike[]
-  history    PlayHistory[]
-  songs      Song[]        @relation("UploadedSongs")
+  id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  auth_uid    String        @unique
+  email       String        @unique
+  first_name  String
+  last_name   String
+  name        String?       // Keeping this for backward compatibility
+  role        String        @default("user")
+  created_at  DateTime      @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime      @updatedAt @db.Timestamptz(6)
+  playlists   Playlist[]
+  likes       UserLike[]
+  history     PlayHistory[]
+  songs       Song[]        @relation("UploadedSongs")
 
   @@map("users")
 }
