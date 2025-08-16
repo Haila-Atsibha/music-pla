@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  auth_uid   String        @unique
+  email      String        @unique
+  name       String?
+  role       String        @default("user")
+  created_at DateTime      @default(now()) @db.Timestamptz(6)
+  playlists  Playlist[]
+  likes      UserLike[]
+  history    PlayHistory[]
+  songs      Song[]        @relation("UploadedSongs")
+
+  @@map("users")
+}
+
+model Song {
+  id           String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title        String
+  artist       String
+  album        String?
+  cover_url    String?
+  storage_url  String
+  uploaded_by  String
+  uploaded_at  DateTime      @default(now()) @db.Timestamptz(6)
+  uploadedBy   User          @relation("UploadedSongs", fields: [uploaded_by], references: [id])
+  playlists    PlaylistSong[]
+  likedBy      UserLike[]
+  inHistory    PlayHistory[]
+
+  @@map("songs")
+}
+
+model Playlist {
+  id         String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String
+  owner_id   String
+  created_at DateTime       @default(now()) @db.Timestamptz(6)
+  owner      User           @relation(fields: [owner_id], references: [id])
+  songs      PlaylistSong[]
+
+  @@map("playlists")
+}
+
+model PlaylistSong {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  playlist_id String   @db.Uuid
+  song_id     String   @db.Uuid
+  added_at    DateTime @default(now()) @db.Timestamptz(6)
+  playlist    Playlist @relation(fields: [playlist_id], references: [id])
+  song        Song     @relation(fields: [song_id], references: [id])
+
+  @@unique([playlist_id, song_id])
+  @@map("playlist_songs")
+}
+
+model UserLike {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id    String   @db.Uuid
+  song_id    String   @db.Uuid
+  liked_at   DateTime @default(now()) @db.Timestamptz(6)
+  user       User     @relation(fields: [user_id], references: [id])
+  song       Song     @relation(fields: [song_id], references: [id])
+
+  @@unique([user_id, song_id])
+  @@map("user_likes")
+}
+
+model PlayHistory {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id    String   @db.Uuid
+  song_id    String   @db.Uuid
+  played_at  DateTime @default(now()) @db.Timestamptz(6)
+  user       User     @relation(fields: [user_id], references: [id])
+  song       Song     @relation(fields: [song_id], references: [id])
+
+  @@map("play_history")
+}
