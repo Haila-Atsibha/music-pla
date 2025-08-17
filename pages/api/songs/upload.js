@@ -1,5 +1,5 @@
-import prisma from '../../../lib/prisma.js'
-import { requireAdmin, validateRequiredFields, handleApiError } from '../../../lib/auth-utils.js'
+const prisma = require('../../../lib/prisma')
+const { requireAdmin, validateRequiredFields, handleApiError } = require('../../../lib/auth-utils')
 
 /**
  * Admin Song Upload API
@@ -100,4 +100,4 @@ async function handler(req, res) {
 }
 
 // Apply admin authentication middleware
-export default requireAdmin(handler)
+module.exports = requireAdmin(handler)

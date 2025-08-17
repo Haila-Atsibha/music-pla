@@ -1,11 +1,11 @@
-import prisma from '../../../lib/prisma.js'
-import { handleApiError } from '../../../lib/auth-utils.js'
+const prisma = require('../../../lib/prisma')
+const { handleApiError } = require('../../../lib/auth-utils')
 
 /**
  * Individual Song API
  * GET /api/songs/[id] - Fetch song by ID with metadata and storage URL
  */
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ 
       error: 'Method not allowed',

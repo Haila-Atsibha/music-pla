@@ -1,11 +1,11 @@
-import { createClient } from '@supabase/supabase-js'
-import prisma from '../../../lib/prisma'
+const { createClient } = require('@supabase/supabase-js')
+const prisma = require('../../../lib/prisma')
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
@@ -82,8 +82,10 @@ export default async function handler(req, res) {
       })
     }
 
-    return res.status(500).json({ 
+    return res.status(500).json({
       error: 'An unexpected error occurred. Please try again.'
     })
   }
 }
+
+module.exports = handler

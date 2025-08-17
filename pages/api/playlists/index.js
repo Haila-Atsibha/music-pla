@@ -1,5 +1,5 @@
-import prisma from '../../../lib/prisma.js'
-import { requireAuth, validateRequiredFields, handleApiError } from '../../../lib/auth-utils.js'
+const prisma = require('../../../lib/prisma')
+const { requireAuth, validateRequiredFields, handleApiError } = require('../../../lib/auth-utils')
 
 /**
  * Playlists API
@@ -182,4 +182,4 @@ async function getUserPlaylists(req, res) {
 }
 
 // Apply authentication middleware
-export default requireAuth(handler)
+module.exports = requireAuth(handler)
