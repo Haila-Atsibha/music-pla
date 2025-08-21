@@ -100,4 +100,4 @@ async function handler(req, res) {
 }
 
 // Apply admin authentication middleware
-module.exports = requireAdmin(handler)
+export default requireAdmin(handler)
