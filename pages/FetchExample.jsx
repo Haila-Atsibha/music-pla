@@ -7,7 +7,7 @@ export default function Home() {
   useEffect(() => {
     async function fetchSongs() {
       try {
-        const res = await fetch("http://localhost:3006/api/songs");
+        const res = await fetch("http://localhost:3000/api/songs");
         const data = await res.json();
         setSongs(data.songs); // backend sends { songs: [...] }
       } catch (err) {
