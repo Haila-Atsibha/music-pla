@@ -89,6 +89,7 @@ async function handler(req, res) {
         code: 'user_not_found'
       })
     }
+    
 
     return res.status(500).json({ 
       error: 'An unexpected error occurred. Please try again.',
@@ -97,4 +98,4 @@ async function handler(req, res) {
   }
 }
 
-module.exports = handler
+export default handler
