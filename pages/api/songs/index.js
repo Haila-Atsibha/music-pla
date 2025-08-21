@@ -5,7 +5,7 @@ const { handleApiError } = require('../../../lib/auth-utils')
  * Songs API
  * GET /api/songs - Fetch all songs with metadata and storage URLs
  */
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ 
       error: 'Method not allowed',
