@@ -4,7 +4,8 @@ import LoginPage from "./login.js"
 import SignupPage from "./signup.js"
 import Dashboard from "./dashboard"
 import Homepage from "./homepage"
-
+import Homemain from "./Main.jsx"
+import UploadButton from "./components/UploadButton.jsx";
 
 
 const geistSans = Geist({
@@ -18,10 +19,9 @@ const geistMono = Geist_Mono({
 });
 
 export default function Home() {
-  return (
-   <div>
 
-<Homepage/>
-   </div>
+  return (
+    
+<Homemain/>
   );
 }
