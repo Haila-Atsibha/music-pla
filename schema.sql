@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
--- Songs table
+-- Songs table (uploaded_by can be NULL for now)
 CREATE TABLE IF NOT EXISTS songs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     title TEXT NOT NULL,
@@ -56,3 +56,5 @@ CREATE TABLE IF NOT EXISTS play_history (
     song_id UUID REFERENCES songs(id) ON DELETE CASCADE,
     played_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
+
+
