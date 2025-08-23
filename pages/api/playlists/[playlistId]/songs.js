@@ -1,5 +1,5 @@
-const prisma = require('../../../../lib/prisma')
-const { requireAuth, validateRequiredFields, handleApiError } = require('../../../../lib/auth-utils')
+import prisma from '../../../../lib/prisma'
+import { requireAuth, validateRequiredFields, handleApiError } from '../../../../lib/auth-utils'
 
 /**
  * Playlist Songs API
@@ -168,4 +168,4 @@ async function addSongToPlaylist(req, res) {
 }
 
 // Apply authentication middleware
-module.exports = requireAuth(handler)
+export default requireAuth(handler)

@@ -1,5 +1,5 @@
-const prisma = require('../../../lib/prisma')
-const { requireAuth, validateRequiredFields, handleApiError } = require('../../../lib/auth-utils')
+import prisma from '../../../lib/prisma'
+import { requireAuth, validateRequiredFields, handleApiError } from '../../../lib/auth-utils'
 
 /**
  * Playlists API

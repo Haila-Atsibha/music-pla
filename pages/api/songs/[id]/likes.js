@@ -1,11 +1,11 @@
-const prisma = require('../../../../lib/prisma')
-const { authenticateUser, handleApiError } = require('../../../../lib/auth-utils')
+import prisma from '../../../../lib/prisma'
+import { authenticateUser, handleApiError } from '../../../../lib/auth-utils'
 
 /**
  * Song Likes Info API
  * GET /api/songs/[id]/likes - Fetch how many likes a song has and recent likes
  */
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ 
       error: 'Method not allowed',
