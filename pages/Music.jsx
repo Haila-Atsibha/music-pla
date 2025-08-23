@@ -3,7 +3,7 @@ import { FaPlay, FaPause, FaVolumeUp} from "react-icons/fa";
 import Liked from "./components/Liked";
 import Playlist from "./components/addplaylist";
 
-export default function MusicCard({ src, title, image }) {
+export default function MusicCard({id, src, title, image }) {
   const audioRef = useRef(null);
   const volumeRef = useRef(null);
 
@@ -154,7 +154,7 @@ export default function MusicCard({ src, title, image }) {
 
       <audio ref={audioRef} src={src}></audio>
       <div className="flex justify-center gap-2 m-2">
-        <Liked/>
+        <Liked songId={id} />
         <Playlist/>
         </div>
       

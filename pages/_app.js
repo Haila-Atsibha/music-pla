@@ -1,8 +1,11 @@
 import "@/styles/globals.css";
-import { MusicProvider } from "./context/MusicContext";
+import { FavoritesProvider } from "./context/FavoriteContext";
 
 export default function App({ Component, pageProps }) {
   
-  return <Component {...pageProps} />;
-
+ return (
+    <FavoritesProvider>
+      <Component {...pageProps} />
+    </FavoritesProvider>
+  );
 }

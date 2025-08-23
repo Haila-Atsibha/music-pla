@@ -1,35 +1,30 @@
 import { useEffect, useState } from "react";
 import MusicCard from "./Music";
+import { supabase } from "../lib/supabase"; // make sure you have this
 
-export default function Home() {
+export default function MusicPage() {
   const [songs, setSongs] = useState([]);
 
   useEffect(() => {
-    async function fetchSongs() {
-      try {
-        const res = await fetch("http://localhost:3000/api/songs");
-        const data = await res.json();
-        setSongs(data.songs); // backend sends { songs: [...] }
-      } catch (err) {
-        console.error("Error fetching songs:", err);
-      }
-    }
+    const fetchSongs = async () => {
+      const { data, error } = await supabase.from("songs").select("*");
+      if (error) console.log(error);
+      else setSongs(data);
+    };
     fetchSongs();
   }, []);
 
   return (
-    <div className="min-h-screen bg-cyan-900 p-6">
-      <h1 className="text-2xl text-white mb-6">Songs</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {songs.map((song) => (
-          <MusicCard
-            key={song.id}
-            src={song.storage_url}   // 🎵 audio file
-            title={song.title}       // 📝 song title
-            image={song.cover_url}   // 🎨 album cover
-          />
-        ))}
-      </div>
+    <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {songs.map((song) => (
+        <MusicCard
+          key={song.id}
+          id={song.id}              // <-- pass the Supabase song ID
+          src={song.storage_url}
+          title={song.title}
+          image={song.cover_url}
+        />
+      ))}
     </div>
   );
 }

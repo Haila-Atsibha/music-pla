@@ -1,5 +1,6 @@
+// pages/api/auth/register.js
 const { createClient } = require('@supabase/supabase-js')
-const prisma = require('../../../lib/prisma')
+import prisma from '../../../lib/prisma'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -50,20 +51,38 @@ async function handler(req, res) {
     })
 
     if (authError) {
-      console.error('Auth error:', authError)
+      console.error('Supabase Auth Error:', authError)
       return res.status(400).json({ error: authError.message })
     }
 
-    // 2. Create user in our database using Prisma
+    console.log('Supabase authData:', authData)
+
+    // 2. Create user in Prisma database
     if (authData.user) {
-      await prisma.user.create({
-        data: {
-          auth_uid: authData.user.id,
-          email: email.toLowerCase().trim(),
-          name: `${firstName.trim()} ${lastName.trim()}`.trim(),
-          role: 'user'
+      try {
+        const dbUser = await prisma.user.create({
+          data: {
+            auth_uid: authData.user.id,
+            email: email.toLowerCase().trim(),
+            first_name: firstName.trim(),
+            last_name: lastName.trim(),
+            name: `${firstName.trim()} ${lastName.trim()}`.trim(),
+            role: 'user'
+          }
+        })
+        console.log('Prisma created user:', dbUser)
+      } catch (dbError) {
+        console.error('Prisma user creation error:', dbError)
+        if (dbError.code === 'P2002') {
+          return res.status(400).json({ 
+            error: 'An account with this email already exists.'
+          })
         }
-      })
+        return res.status(500).json({ error: 'Database error: ' + dbError.message })
+      }
+    } else {
+      console.error('No auth user returned from Supabase:', authData)
+      return res.status(500).json({ error: 'Supabase did not return a user object.' })
     }
 
     // 3. Return success response
@@ -73,18 +92,8 @@ async function handler(req, res) {
     })
 
   } catch (error) {
-    console.error('Registration error:', error)
-    
-    // Handle duplicate email error
-    if (error.code === 'P2002') {
-      return res.status(400).json({ 
-        error: 'An account with this email already exists.'
-      })
-    }
-
-    return res.status(500).json({
-      error: 'An unexpected error occurred. Please try again.'
-    })
+    console.error('Unexpected Registration Error:', error)
+    return res.status(500).json({ error: 'Unexpected error: ' + error.message })
   }
 }
 

@@ -44,8 +44,8 @@ export default function Homemain() {
         </div>
 
         {/* Artists Link */}
-        <Link href={"/"} className="whitespace-nowrap hover:text-[#8EBBFF] transition">
-          Artists
+        <Link href={"/favorites"} className="whitespace-nowrap hover:text-[#8EBBFF] transition">
+          Favorites
         </Link>
       </div>
     </header>
