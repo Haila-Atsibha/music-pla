@@ -1,16 +1,58 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import { FaSearch } from "react-icons/fa";
 import SongsList from "./FetchExample.jsx";
 import BottomPlayerBar from "../components/BottomPlayerBar";
+import { fetchSongs } from "../lib/music-api";
 
 export default function Homemain() {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentSong, setCurrentSong] = useState(null);
+  const [songs, setSongs] = useState([]);
+  const [filteredSongs, setFilteredSongs] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Fetch songs on component mount
+  useEffect(() => {
+    fetchSongsData();
+  }, []);
+
+  // Filter songs based on search query
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setFilteredSongs(songs);
+    } else {
+      const filtered = songs.filter(song => 
+        song.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        song.artist?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        song.album?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredSongs(filtered);
+    }
+  }, [searchQuery, songs]);
+
+  const fetchSongsData = async () => {
+    try {
+      setIsLoading(true);
+      const data = await fetchSongs();
+      setSongs(data.songs || []);
+      setFilteredSongs(data.songs || []);
+    } catch (error) {
+      console.error('Error fetching songs:', error);
+      // You could show a user-friendly error message here
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
+    // Search is handled by the useEffect above
+  };
+
+  const handleSongPlay = (song) => {
+    setCurrentSong(song);
   };
 
   return (
@@ -24,7 +66,6 @@ export default function Homemain() {
               type="text"
               value={searchQuery}
               onChange={(e) => {
-                console.log('Search query changed:', e.target.value); // Debug
                 setSearchQuery(e.target.value);
               }}
               className="w-full h-10 sm:h-12 rounded-2xl border-2 border-[#8EBBFF] bg-[#24293E] text-[#F4F5FC] pl-4 pr-10 placeholder-[#CCCCCC] focus:outline-none focus:ring-2 focus:ring-[#8EBBFF] focus:ring-offset-1 transition-all duration-300"
@@ -34,7 +75,18 @@ export default function Homemain() {
               <FaSearch />
             </button>
           </form>
-          <SongsList searchQuery={searchQuery} onSongPlay={setCurrentSong} />
+          
+          {isLoading ? (
+            <div className="flex justify-center items-center h-32">
+              <div className="text-[#8EBBFF] text-lg">Loading songs...</div>
+            </div>
+          ) : (
+            <SongsList 
+              songs={filteredSongs} 
+              onSongPlay={handleSongPlay}
+              searchQuery={searchQuery}
+            />
+          )}
         </div>
       </main>
       <BottomPlayerBar song={currentSong} artist={currentSong?.artist} />

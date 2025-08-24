@@ -12,14 +12,14 @@ export default function BottomPlayerBar({ song, artist }) {
 
   // Handle song changes
   useEffect(() => {
-    if (song && song.src && audioRef.current) {
-      audioRef.current.src = song.src;
+    if (song && song.storage_url && audioRef.current) {
+      audioRef.current.src = song.storage_url;
       audioRef.current.load();
       if (isPlaying) {
         audioRef.current.play();
       }
     }
-  }, [song]);
+  }, [song, isPlaying]);
 
   // Handle play/pause
   useEffect(() => {
@@ -40,15 +40,21 @@ export default function BottomPlayerBar({ song, artist }) {
     const updateTime = () => setCurrentTime(audio.currentTime);
     const updateDuration = () => setDuration(audio.duration);
     const handleEnded = () => setIsPlaying(false);
+    const handleError = (e) => {
+      console.error('Audio error:', e);
+      setIsPlaying(false);
+    };
 
     audio.addEventListener('timeupdate', updateTime);
     audio.addEventListener('loadedmetadata', updateDuration);
     audio.addEventListener('ended', handleEnded);
+    audio.addEventListener('error', handleError);
 
     return () => {
       audio.removeEventListener('timeupdate', updateTime);
       audio.removeEventListener('loadedmetadata', updateDuration);
       audio.removeEventListener('ended', handleEnded);
+      audio.removeEventListener('error', handleError);
     };
   }, []);
 
@@ -83,12 +89,12 @@ export default function BottomPlayerBar({ song, artist }) {
       {/* Song Info */}
       <div className="flex items-center gap-4 min-w-[200px]">
         <div className="w-14 h-14 bg-[#2A2F4F] rounded-lg overflow-hidden flex-shrink-0">
-          {/* Album art placeholder */}
-          <img src={song?.image || "/file.svg"} alt={song?.title || "Song"} className="w-full h-full object-cover" />
+          {/* Album art */}
+          <img src={song?.cover_url || song?.image || "/file.svg"} alt={song?.title || "Song"} className="w-full h-full object-cover" />
         </div>
         <div>
           <div className="font-semibold text-base truncate max-w-[120px]">{song?.title || "Song Title"}</div>
-          <div className="text-xs text-[#8EBBFF] truncate max-w-[120px]">{artist || "Artist Name"}</div>
+          <div className="text-xs text-[#8EBBFF] truncate max-w-[120px]">{artist || song?.artist || "Artist Name"}</div>
         </div>
       </div>
 
