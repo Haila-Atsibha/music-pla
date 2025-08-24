@@ -1,5 +1,5 @@
-const prisma = require('../../../../../lib/prisma')
-const { requireAuth, handleApiError } = require('../../../../../lib/auth-utils')
+import prisma from '../../../../../lib/prisma'
+import { requireAuth, handleApiError } from '../../../../../lib/auth-utils'
 
 /**
  * Remove Song from Playlist API
@@ -114,4 +114,4 @@ async function handler(req, res) {
 }
 
 // Apply authentication middleware
-module.exports = requireAuth(handler)
+export default requireAuth(handler)

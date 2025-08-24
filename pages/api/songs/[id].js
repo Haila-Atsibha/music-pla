@@ -1,5 +1,5 @@
-const prisma = require('../../../lib/prisma')
-const { handleApiError } = require('../../../lib/auth-utils')
+import prisma from '../../../lib/prisma'
+import { handleApiError } from '../../../lib/auth-utils'
 
 /**
  * Individual Song API
@@ -120,3 +120,5 @@ module.exports = async function handler(req, res) {
     return handleApiError(res, error, 'Failed to fetch song')
   }
 }
+
+export default handler

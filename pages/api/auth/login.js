@@ -1,5 +1,5 @@
-const { createClient } = require('@supabase/supabase-js')
-const prisma = require('../../../lib/prisma')
+import { createClient } from '@supabase/supabase-js'
+import prisma from '../../../lib/prisma'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -89,6 +89,7 @@ async function handler(req, res) {
         code: 'user_not_found'
       })
     }
+    
 
     return res.status(500).json({ 
       error: 'An unexpected error occurred. Please try again.',

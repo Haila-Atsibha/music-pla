@@ -1,6 +1,5 @@
-// pages/api/auth/register.js
 const { createClient } = require('@supabase/supabase-js')
-import prisma from '../../../lib/prisma'
+const prisma = require('../../../lib/prisma')
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
