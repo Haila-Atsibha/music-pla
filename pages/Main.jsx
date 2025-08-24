@@ -27,7 +27,7 @@ export default function Homemain() {
       {/* Center area */}
       <div className="flex flex-1 items-center gap-4">
         {/* Music Link */}
-        <Link href={"/"} className="whitespace-nowrap hover:text-[#8EBBFF] transition">
+        <Link href={"/Music"} className="whitespace-nowrap hover:text-[#8EBBFF] transition">
           Music
         </Link>
 

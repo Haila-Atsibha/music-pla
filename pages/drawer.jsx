@@ -12,15 +12,15 @@ export default function Drawer({ isOpen, displayDrawer }) {
           className="self-end text-white text-2xl mb-4">
           <FaTimes />
         </button>
-      <Link href="/">Home</Link>
-      <Link href="/">Music</Link>
-      <Link href="/">Artists</Link>
-      <Link href="/">Home</Link>
-      <Link href="/">Music</Link>
-      <Link href="/">Artists</Link>
-      <Link href="/">Home</Link>
-      <Link href="/">Music</Link>
-      <Link href="/">Artists</Link>
+  <Link href="/">Home</Link>
+  <Link href="/Music">Music</Link>
+  <Link href="/artists">Artists</Link>
+  <Link href="/">Home</Link>
+  <Link href="/Music">Music</Link>
+  <Link href="/artists">Artists</Link>
+  <Link href="/">Home</Link>
+  <Link href="/Music">Music</Link>
+  <Link href="/artists">Artists</Link>
     </div>
   );
 }

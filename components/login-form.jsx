@@ -31,8 +31,8 @@ export default function LoginForm() {
       // Store session and user data
       storeSession(response.session, response.user)
 
-      // Redirect to dashboard or home page
-      router.push('/dashboard')
+  // Redirect to main page
+  router.push('/Main')
     } catch (error) {
       setError(error.message)
     } finally {
