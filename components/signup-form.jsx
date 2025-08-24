@@ -81,22 +81,22 @@ export default function SignupForm() {
   ]
 
   return (
-    <Card className="w-full shadow-xl border-0 bg-white/95 backdrop-blur">
+    <Card className="w-full shadow-xl border-0 bg-[#24293E] text-[#F4F5FC] backdrop-blur">
       <CardHeader className="space-y-2 text-center pb-8">
-        <CardTitle className="text-3xl font-bold text-gray-900">Create Account</CardTitle>
-        <CardDescription className="text-gray-600 text-lg">Join us today and get started</CardDescription>
+        <CardTitle className="text-3xl font-bold">Create Account</CardTitle>
+        <CardDescription className="text-[#CCCCCC] text-lg">Join us today and get started</CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-6">
         {error && (
-          <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-600 text-sm">{error}</p>
+          <div className="p-4 bg-red-900/20 border border-red-700/50 rounded-lg">
+            <p className="text-red-300 text-sm">{error}</p>
           </div>
         )}
 
         {success && (
-          <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-            <p className="text-green-600 text-sm">{success}</p>
+          <div className="p-4 bg-green-900/20 border border-green-700/50 rounded-lg">
+            <p className="text-green-300 text-sm">{success}</p>
           </div>
         )}
 
@@ -113,7 +113,7 @@ export default function SignupForm() {
                 value={formData.firstName}
                 onChange={handleChange}
                 placeholder="John"
-                className="h-12 border-gray-300 focus:border-red-500 focus:ring-red-500"
+                className="h-12 bg-[#2E3449] border-[#3A4055] text-[#F4F5FC] focus:border-[#BEBBFF] focus:ring-[#BEBBFF]"
                 required
               />
             </div>
@@ -128,7 +128,7 @@ export default function SignupForm() {
                 value={formData.lastName}
                 onChange={handleChange}
                 placeholder="Doe"
-                className="h-12 border-gray-300 focus:border-red-500 focus:ring-red-500"
+                className="h-12 bg-[#2E3449] border-[#3A4055] text-[#F4F5FC] focus:border-[#BEBBFF] focus:ring-[#BEBBFF]"
                 required
               />
             </div>
@@ -145,7 +145,7 @@ export default function SignupForm() {
               value={formData.email}
               onChange={handleChange}
               placeholder="john@example.com"
-              className="h-12 border-gray-300 focus:border-red-500 focus:ring-red-500"
+              className="h-12 bg-[#2E3449] border-[#3A4055] text-[#F4F5FC] focus:border-[#BEBBFF] focus:ring-[#BEBBFF]"
               required
             />
           </div>
@@ -162,13 +162,13 @@ export default function SignupForm() {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="Create a strong password"
-                className="h-12 pr-12 border-gray-300 focus:border-red-500 focus:ring-red-500"
+                className="h-12 pr-12 bg-[#2E3449] border-[#3A4055] text-[#F4F5FC] focus:border-[#BEBBFF] focus:ring-[#BEBBFF]"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#CCCCCC] hover:text-[#F4F5FC]"
               >
                 {showPassword ? <EyeOffIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
               </button>
@@ -177,11 +177,15 @@ export default function SignupForm() {
             {formData.password && (
               <div className="space-y-2 mt-3">
                 <p className="text-sm font-medium text-gray-700">Password requirements:</p>
-                <div className="space-y-1">
-                  {passwordRequirements.map((req, index) => (
-                    <div key={index} className="flex items-center space-x-2">
-                      <CheckIcon className={`h-4 w-4 ${req.met ? "text-green-500" : "text-gray-300"}`} />
-                      <span className={`text-sm ${req.met ? "text-green-600" : "text-gray-500"}`}>{req.text}</span>
+                <div className="space-y-2">
+                  {passwordRequirements.map((req, i) => (
+                    <div key={i} className="flex items-center space-x-2">
+                      <div className={`w-4 h-4 rounded-full flex items-center justify-center ${req.met ? 'bg-green-900/30' : 'bg-[#2E3449]'}`}>
+                        {req.met && <CheckIcon className="h-3 w-3 text-green-300" />}
+                      </div>
+                      <span className={`text-xs ${req.met ? 'text-green-300' : 'text-[#CCCCCC]'}`}>
+                        {req.text}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -190,7 +194,7 @@ export default function SignupForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
+            <Label htmlFor="confirmPassword" className="text-sm font-medium text-[#F4F5FC]">
               Confirm Password
             </Label>
             <div className="relative">
@@ -201,13 +205,13 @@ export default function SignupForm() {
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 placeholder="Confirm your password"
-                className="h-12 pr-12 border-gray-300 focus:border-red-500 focus:ring-red-500"
+                className="h-12 pr-12 bg-[#2E3449] border-[#3A4055] text-[#F4F5FC] focus:border-[#BEBBFF] focus:ring-[#BEBBFF]"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#CCCCCC] hover:text-[#F4F5FC]"
               >
                 {showConfirmPassword ? <EyeOffIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
               </button>
@@ -221,13 +225,13 @@ export default function SignupForm() {
               className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded mt-1"
               required
             />
-            <Label htmlFor="terms" className="text-sm text-gray-600 leading-relaxed">
+            <Label htmlFor="terms" className="text-sm text-[#CCCCCC] leading-relaxed">
               I agree to the{" "}
-              <Link href="/terms" className="text-red-600 hover:text-red-700 font-medium">
+              <Link href="/terms" className="text-[#BEBBFF] hover:text-[#A8A4FF] font-medium">
                 Terms of Service
               </Link>{" "}
               and{" "}
-              <Link href="/privacy" className="text-red-600 hover:text-red-700 font-medium">
+              <Link href="/privacy" className="text-[#BEBBFF] hover:text-[#A8A4FF] font-medium">
                 Privacy Policy
               </Link>
             </Label>
@@ -236,29 +240,29 @@ export default function SignupForm() {
           <Button
             type="submit"
             disabled={isLoading}
-            className="w-full h-12 bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white font-semibold text-lg"
+            className="w-full h-12 bg-[#BEBBFF] hover:bg-[#A8A4FF] text-[#1A1F33] font-medium"
           >
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Creating Account...
+                Creating account...
               </>
             ) : (
-              "Create Account"
+              'Sign Up'
             )}
           </Button>
         </form>
 
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300" />
+            <div className="w-full border-t border-[#3A4055]" />
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-4 bg-white text-gray-500">Or continue with</span>
+            <span className="px-4 bg-[#24293E] text-[#CCCCCC]">Or continue with</span>
           </div>
         </div>
 
-        <Button variant="outline" className="w-full h-12 border-gray-300 hover:bg-gray-50 font-semibold bg-transparent">
+        <Button variant="outline" className="w-full h-12 border-[#3A4055] hover:bg-[#2E3449] font-semibold bg-transparent text-[#F4F5FC] hover:text-[#F4F5FC]">
           <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
             <path
               fill="currentColor"
@@ -282,9 +286,9 @@ export default function SignupForm() {
       </CardContent>
 
       <CardFooter className="justify-center pt-6">
-        <p className="text-sm text-gray-600">
-          Already have an account?{" "}
-          <Link href="/login" className="text-red-600 hover:text-red-700 font-medium">
+        <p className="text-center text-sm text-[#CCCCCC]">
+          Already have an account?{' '}
+          <Link href="/login" className="font-medium text-[#BEBBFF] hover:text-[#A8A4FF]">
             Sign in
           </Link>
         </p>

@@ -48,16 +48,16 @@ export default function LoginForm() {
   }
 
   return (
-    <Card className="w-full shadow-xl border-0 bg-white/95 backdrop-blur">
+    <Card className="w-full shadow-xl border-0 bg-[#24293E] text-[#F4F5FC] backdrop-blur">
       <CardHeader className="space-y-2 text-center pb-8">
-        <CardTitle className="text-3xl font-bold text-gray-900">Welcome Back</CardTitle>
-        <CardDescription className="text-gray-600 text-lg">Sign in to your account to continue</CardDescription>
+        <CardTitle className="text-3xl font-bold">Welcome Back</CardTitle>
+        <CardDescription className="text-[#CCCCCC] text-lg">Sign in to your account to continue</CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-6">
         {error && (
-          <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-600 text-sm">{error}</p>
+          <div className="p-4 bg-red-900/20 border border-red-700/50 rounded-lg">
+            <p className="text-red-300 text-sm">{error}</p>
           </div>
         )}
 
@@ -73,7 +73,7 @@ export default function LoginForm() {
               value={formData.email}
               onChange={handleChange}
               placeholder="Enter your email"
-              className="h-12 border-gray-300 focus:border-red-500 focus:ring-red-500"
+              className="h-12 bg-[#2E3449] border-[#3A4055] text-[#F4F5FC] focus:border-[#BEBBFF] focus:ring-[#BEBBFF]"
               required
             />
           </div>
@@ -90,13 +90,13 @@ export default function LoginForm() {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="Enter your password"
-                className="h-12 pr-12 border-gray-300 focus:border-red-500 focus:ring-red-500"
+                className="h-12 pr-12 bg-[#2E3449] border-[#3A4055] text-[#F4F5FC] focus:border-[#BEBBFF] focus:ring-[#BEBBFF]"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#CCCCCC] hover:text-[#F4F5FC]"
               >
                 {showPassword ? <EyeOffIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
               </button>
@@ -122,15 +122,15 @@ export default function LoginForm() {
           <Button
             type="submit"
             disabled={isLoading}
-            className="w-full h-12 bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white font-semibold text-lg"
+            className="w-full h-12 bg-[#BEBBFF] hover:bg-[#A8A4FF] text-[#1A1F33] font-medium"
           >
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Signing In...
+                Signing in...
               </>
             ) : (
-              "Sign In"
+              'Sign In'
             )}
           </Button>
         </form>
@@ -168,9 +168,9 @@ export default function LoginForm() {
       </CardContent>
 
       <CardFooter className="justify-center pt-6">
-        <p className="text-sm text-gray-600">
-          Don't have an account?{" "}
-          <Link href="/signup" className="text-red-600 hover:text-red-700 font-medium">
+        <p className="text-center text-sm text-[#CCCCCC]">
+          Don't have an account?{' '}
+          <Link href="/signup" className="font-medium text-[#BEBBFF] hover:text-[#A8A4FF]">
             Sign up
           </Link>
         </p>

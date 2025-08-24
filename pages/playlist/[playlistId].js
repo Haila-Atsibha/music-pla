@@ -124,7 +124,7 @@ export default function PlaylistDetail() {
               <button
                 onClick={handleDeletePlaylist}
                 disabled={isDeleting}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+                className="px-4 py-2 bg-[#3A3F5F] text-[#F4F5FC] rounded-lg hover:bg-[#4A4F6F] transition-colors disabled:opacity-50 flex items-center gap-2 border border-[#8EBBFF] hover:border-[#6FAFFF]"
               >
                 <FaTrash size={16} />
                 {isDeleting ? 'Deleting...' : 'Delete Playlist'}
@@ -151,7 +151,7 @@ export default function PlaylistDetail() {
                   {/* Remove button overlay */}
                   <button
                     onClick={() => handleRemoveSong(playlistSong.song.id)}
-                    className="absolute top-2 right-2 bg-red-600 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700"
+                    className="absolute top-2 right-2 bg-[#3A3F5F] text-[#F4F5FC] p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-[#4A4F6F] border border-[#8EBBFF] hover:border-[#6FAFFF]"
                   >
                     <FaTrash size={12} />
                   </button>

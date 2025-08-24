@@ -55,7 +55,7 @@ export default function HistoryPage() {
             {history.length > 0 && (
               <button 
                 onClick={clearHistory}
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors flex items-center gap-2"
+                className="bg-[#3A3F5F] hover:bg-[#4A4F6F] text-[#F4F5FC] px-4 py-2 rounded-lg font-semibold transition-colors flex items-center gap-2 border border-[#8EBBFF] hover:border-[#6FAFFF]"
               >
                 <FaTrash /> Clear History
               </button>

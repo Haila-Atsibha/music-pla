@@ -93,22 +93,35 @@ export default function Sidebar() {
           
           {/* Create Playlist Form */}
           {showCreateForm && (
-            <div className="mb-4 p-3 bg-[#2A2F4F] rounded-lg">
-              <form onSubmit={handleCreatePlaylist} className="space-y-2">
-                <input
-                  type="text"
-                  value={newPlaylistName}
-                  onChange={(e) => setNewPlaylistName(e.target.value)}
-                  placeholder="Playlist name"
-                  className="w-full px-2 py-1 bg-[#24293E] border border-[#8EBBFF] rounded text-sm text-[#F4F5FC] placeholder-[#8EBBFF] focus:outline-none focus:ring-1 focus:ring-[#8EBBFF]"
-                />
+            <div className="mb-4 p-4 bg-[#2A2F4F] rounded-lg border border-[#8EBBFF]">
+              <form onSubmit={handleCreatePlaylist} className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-[#8EBBFF] mb-1">
+                    Playlist Name
+                  </label>
+                  <input
+                    type="text"
+                    value={newPlaylistName}
+                    onChange={(e) => setNewPlaylistName(e.target.value)}
+                    placeholder="Enter playlist name"
+                    className="w-full px-3 py-2 bg-[#24293E] border border-[#8EBBFF] rounded-lg text-sm text-[#F4F5FC] placeholder-[#8EBBFF] focus:outline-none focus:ring-2 focus:ring-[#8EBBFF] focus:ring-opacity-50 transition-all"
+                    autoFocus
+                  />
+                </div>
                 <div className="flex gap-2">
                   <button
                     type="submit"
-                    disabled={isCreating}
-                    className="px-3 py-1 bg-[#8EBBFF] text-[#23263A] rounded text-sm hover:bg-[#6FAFFF] transition-colors disabled:opacity-50"
+                    disabled={isCreating || !newPlaylistName.trim()}
+                    className="px-3 py-2 bg-[#8EBBFF] text-[#23263A] rounded-lg text-sm hover:bg-[#6FAFFF] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                   >
-                    {isCreating ? 'Creating...' : 'Create'}
+                    {isCreating ? (
+                      <>
+                        <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-[#23263A]"></div>
+                        Creating...
+                      </>
+                    ) : (
+                      'Create Playlist'
+                    )}
                   </button>
                   <button
                     type="button"
@@ -116,7 +129,7 @@ export default function Sidebar() {
                       setShowCreateForm(false);
                       setNewPlaylistName("");
                     }}
-                    className="px-3 py-1 bg-[#3A3F5F] text-[#F4F5FC] rounded text-sm hover:bg-[#4A4F6F] transition-colors"
+                    className="px-3 py-2 bg-[#3A3F5F] text-[#F4F5FC] rounded-lg text-sm hover:bg-[#4A4F6F] transition-colors"
                   >
                     Cancel
                   </button>
@@ -142,7 +155,7 @@ export default function Sidebar() {
                   </Link>
                   <button
                     onClick={() => handleDeletePlaylist(playlist.id)}
-                    className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-300 transition-all"
+                    className="opacity-0 group-hover:opacity-100 text-[#8EBBFF] hover:text-[#6FAFFF] transition-all p-1 rounded hover:bg-[#3A3F5F]"
                   >
                     <FaTrash size={12} />
                   </button>

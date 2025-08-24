@@ -9,7 +9,7 @@ export default function SignupPage() {
         <meta name="description" content="Create your music platform account" />
       </Head>
       
-      <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-red-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[#24293E] flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           <SignupForm />
         </div>
