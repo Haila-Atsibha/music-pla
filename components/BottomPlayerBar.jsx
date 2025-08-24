@@ -13,10 +13,25 @@ export default function BottomPlayerBar({ song, artist }) {
   // Handle song changes
   useEffect(() => {
     if (song && song.storage_url && audioRef.current) {
+      // Reset current time when changing songs
+      setCurrentTime(0);
+      
       audioRef.current.src = song.storage_url;
       audioRef.current.load();
+      
+      // Auto-play the new song if we were already playing
       if (isPlaying) {
-        audioRef.current.play();
+        // Wait for the audio to be ready before playing
+        const handleCanPlay = () => {
+          audioRef.current.play().catch(error => {
+            console.error('Auto-play failed:', error);
+            // If auto-play fails, keep the player in playing state but don't start audio
+            // This is common in browsers that block auto-play
+          });
+          audioRef.current.removeEventListener('canplay', handleCanPlay);
+        };
+        
+        audioRef.current.addEventListener('canplay', handleCanPlay);
       }
     }
   }, [song, isPlaying]);
