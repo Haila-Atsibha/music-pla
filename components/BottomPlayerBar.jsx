@@ -1,14 +1,72 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FaPlay, FaPause, FaStepForward, FaStepBackward, FaVolumeUp, FaRandom, FaRedo } from "react-icons/fa";
 
 export default function BottomPlayerBar({ song, artist }) {
-  // Dummy state for demonstration; replace with context or props in real app
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(180); // 3 min default
+  const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
   const [isShuffling, setIsShuffling] = useState(false);
   const [isRepeating, setIsRepeating] = useState(false);
+  const audioRef = useRef(null);
+
+  // Handle song changes
+  useEffect(() => {
+    if (song && song.src && audioRef.current) {
+      audioRef.current.src = song.src;
+      audioRef.current.load();
+      if (isPlaying) {
+        audioRef.current.play();
+      }
+    }
+  }, [song]);
+
+  // Handle play/pause
+  useEffect(() => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.play();
+      } else {
+        audioRef.current.pause();
+      }
+    }
+  }, [isPlaying]);
+
+  // Audio event listeners
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const updateTime = () => setCurrentTime(audio.currentTime);
+    const updateDuration = () => setDuration(audio.duration);
+    const handleEnded = () => setIsPlaying(false);
+
+    audio.addEventListener('timeupdate', updateTime);
+    audio.addEventListener('loadedmetadata', updateDuration);
+    audio.addEventListener('ended', handleEnded);
+
+    return () => {
+      audio.removeEventListener('timeupdate', updateTime);
+      audio.removeEventListener('loadedmetadata', updateDuration);
+      audio.removeEventListener('ended', handleEnded);
+    };
+  }, []);
+
+  const handleSeek = (e) => {
+    const newTime = Number(e.target.value);
+    setCurrentTime(newTime);
+    if (audioRef.current) {
+      audioRef.current.currentTime = newTime;
+    }
+  };
+
+  const handleVolumeChange = (e) => {
+    const newVolume = Number(e.target.value);
+    setVolume(newVolume);
+    if (audioRef.current) {
+      audioRef.current.volume = newVolume;
+    }
+  };
 
   const formatTime = (time) => {
     if (isNaN(time)) return "0:00";
@@ -16,6 +74,9 @@ export default function BottomPlayerBar({ song, artist }) {
     const seconds = Math.floor(time % 60).toString().padStart(2, "0");
     return `${minutes}:${seconds}`;
   };
+
+  // Don't render if no song is selected
+  if (!song) return null;
 
   return (
     <div className="fixed bottom-0 left-0 w-full bg-[#23263A] text-[#F4F5FC] shadow-2xl z-50 flex items-center justify-between px-8 py-3">
@@ -62,7 +123,7 @@ export default function BottomPlayerBar({ song, artist }) {
             max={duration}
             step="0.1"
             value={currentTime}
-            onChange={e => setCurrentTime(Number(e.target.value))}
+            onChange={handleSeek}
             className="flex-1 accent-[#8EBBFF] h-1"
           />
           <span className="text-xs w-10">{formatTime(duration)}</span>
@@ -78,10 +139,13 @@ export default function BottomPlayerBar({ song, artist }) {
           max="1"
           step="0.01"
           value={volume}
-          onChange={e => setVolume(Number(e.target.value))}
+          onChange={handleVolumeChange}
           className="accent-[#8EBBFF] w-24"
         />
       </div>
+
+      {/* Hidden audio element */}
+      <audio ref={audioRef} preload="metadata" />
     </div>
   );
 }

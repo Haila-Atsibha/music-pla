@@ -5,7 +5,7 @@ export default function Sidebar() {
   return (
     <aside className="fixed top-0 left-0 h-full w-56 bg-[#23263A] text-[#F4F5FC] flex flex-col py-8 px-4 shadow-xl z-40">
       <nav className="flex flex-col gap-6">
-        <Link href="/Music" className="flex items-center gap-3 text-lg hover:text-[#8EBBFF] transition">
+        <Link href="/Main" className="flex items-center gap-3 text-lg hover:text-[#8EBBFF] transition">
           <FaMusic /> Music
         </Link>
         <Link href="/favorites" className="flex items-center gap-3 text-lg hover:text-[#8EBBFF] transition">

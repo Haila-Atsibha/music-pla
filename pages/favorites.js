@@ -1,21 +1,13 @@
 import { useState, useEffect } from "react";
 import MusicCard from "./Music";
 import { supabase } from "../lib/supabase";
-import Drawer from "./drawer";
-import { FaBars, FaSearch } from "react-icons/fa";
-import Link from "next/link"; 
+import Sidebar from "../components/Sidebar";
+import BottomPlayerBar from "../components/BottomPlayerBar";
+import { FaHeart } from "react-icons/fa";
 
 export default function FavoritesPage() {
   const [songs, setSongs] = useState([]);
-  const [isOpen, setIsOpen] = useState(false);
-
-  function displayDrawer() {
-    setIsOpen(prev => {
-      const newState = !prev;
-      console.log(newState ? "opened" : "closed");
-      return newState;
-    });
-  }
+  const [currentSong, setCurrentSong] = useState(null);
 
   useEffect(() => {
     const fetchFavorites = async () => {
@@ -34,61 +26,50 @@ export default function FavoritesPage() {
     fetchFavorites();
   }, []);
 
+  const handleSongPlay = (song) => {
+    setCurrentSong(song);
+  };
+
   return (
-    <>
-      <header className="bg-[#24293E] text-[#F4F5FC] w-full h-20 flex items-center px-4 sm:px-6 lg:px-8">
-        {/* Left Menu */}
-        <button
-          className="px-3 py-2 bg-[hsl(216,93%,50%)] text-[#24293E] rounded-lg hover:bg-[#6FAFFF] transition mr-4 flex items-center gap-2"
-          onClick={displayDrawer}
-        >
-          <FaBars />Menu
-        </button>
-
-        {/* Center area */}
-        <div className="flex flex-1 items-center gap-4">
-          <Link href={"/"} className="whitespace-nowrap hover:text-[#8EBBFF] transition">
-            Music
-          </Link>
-
-          <div className="relative flex-1">
-            <input
-              type="text"
-              className="w-full h-10 sm:h-12 rounded-2xl border-2 border-[#8EBBFF] bg-[#24293E] text-[#F4F5FC] pl-4 pr-10 placeholder-[#CCCCCC] focus:outline-none focus:ring-2 focus:ring-[#8EBBFF] focus:ring-offset-1 transition-all duration-300"
-              placeholder="Search..."
-            />
-            <button className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8EBBFF] hover:text-[#F4F5FC] transition-colors duration-300">
-              <FaSearch />
-            </button>
+    <div className="flex min-h-screen bg-[#24293E]">
+      <Sidebar />
+      <main className="flex-1 pl-56 bg-cover min-h-screen pb-28">
+        <div className="p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-3xl font-bold text-[#F4F5FC] flex items-center gap-3">
+              <FaHeart className="text-red-500" />
+              My Favorites
+            </h1>
+            {songs.length > 0 && (
+              <div className="text-[#8EBBFF]">
+                {songs.length} favorite{songs.length !== 1 ? 's' : ''}
+              </div>
+            )}
           </div>
 
-          <Link href={"/favorites"} className="whitespace-nowrap hover:text-[#8EBBFF] transition">
-            Favorites
-          </Link>
+          {songs.length === 0 ? (
+            <div className="text-center py-16">
+              <FaHeart className="text-6xl text-gray-400 mx-auto mb-4" />
+              <p className="text-xl text-[#F4F5FC] mb-2">No favorite songs yet</p>
+              <p className="text-[#8EBBFF]">Start adding songs to your favorites!</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {songs.map((song) => (
+                <div key={song.id} onClick={() => handleSongPlay(song)}>
+                  <MusicCard
+                    id={song.id}
+                    src={song.storage_url}
+                    title={song.title}
+                    image={song.cover_url}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      </header>
-<div className="bg-[#24293E] bg-cover w-full min-h-[calc(100vh-5rem)] p-4 flex flex-col">
-  {songs.length === 0 ? (
-    <div className="flex-1 flex items-center justify-center">
-      <p className="text-[#F4F5FC] text-xl">No favorites yet</p>
+      </main>
+      <BottomPlayerBar song={currentSong} artist={currentSong?.artist} />
     </div>
-  ) : (
-    <div className="flex flex-wrap gap-4 justify-start">
-      {songs.map((song) => (
-        <MusicCard
-          key={song.id}
-          id={song.id}
-          src={song.storage_url}
-          title={song.title}
-          image={song.cover_url}
-        />
-      ))}
-    </div>
-  )}
-</div>
-
-
-      <Drawer isOpen={isOpen} displayDrawer={displayDrawer} />
-    </>
   );
 }
