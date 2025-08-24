@@ -3,32 +3,42 @@ import { FaHistory, FaTrash } from "react-icons/fa";
 import Sidebar from "../components/Sidebar";
 import BottomPlayerBar from "../components/BottomPlayerBar";
 import MusicCard from "./Music";
+import { fetchHistory } from "../lib/music-api";
 
 export default function HistoryPage() {
   const [history, setHistory] = useState([]);
   const [currentSong, setCurrentSong] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Load history from localStorage
-    const savedHistory = localStorage.getItem("playHistory");
-    if (savedHistory) {
-      setHistory(JSON.parse(savedHistory));
-    }
+    fetchHistoryData();
   }, []);
+
+  const fetchHistoryData = async () => {
+    try {
+      setIsLoading(true);
+      const data = await fetchHistory();
+      setHistory(data.history || []);
+    } catch (error) {
+      console.error('Error fetching history:', error);
+      if (error.message.includes('Authentication required')) {
+        // User needs to log in, show empty state
+        setHistory([]);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSongPlay = (song) => {
     setCurrentSong(song);
-    
-    // Add to history
-    const newHistory = [song, ...history.filter(h => h.id !== song.id)].slice(0, 50);
-    setHistory(newHistory);
-    localStorage.setItem("playHistory", JSON.stringify(newHistory));
   };
 
   const clearHistory = () => {
     if (confirm("Are you sure you want to clear your listening history?")) {
+      // Note: This would require a DELETE endpoint in the API
+      // For now, we'll just clear the local state
       setHistory([]);
-      localStorage.removeItem("playHistory");
     }
   };
 
@@ -52,7 +62,11 @@ export default function HistoryPage() {
             )}
           </div>
 
-          {history.length === 0 ? (
+          {isLoading ? (
+            <div className="text-center py-16">
+              <div className="text-[#8EBBFF] text-lg">Loading history...</div>
+            </div>
+          ) : history.length === 0 ? (
             <div className="text-center py-16">
               <FaHistory className="text-6xl text-gray-400 mx-auto mb-4" />
               <p className="text-xl text-[#F4F5FC] mb-2">No listening history yet</p>
@@ -65,18 +79,17 @@ export default function HistoryPage() {
               </div>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {history.map((song, index) => (
-                  <div key={`${song.id}-${index}`} className="relative">
-                    <div onClick={() => handleSongPlay(song)}>
-                      <MusicCard
-                        id={song.id}
-                        src={song.storage_url}
-                        title={song.title}
-                        image={song.image || song.cover_url}
-                        artist={song.artist}
-                        album={song.album}
-                      />
-                    </div>
+                {history.map((entry, index) => (
+                  <div key={`${entry.id}-${index}`} className="relative">
+                    <MusicCard
+                      id={entry.song.id}
+                      src={entry.song.storage_url}
+                      title={entry.song.title}
+                      image={entry.song.cover_url}
+                      artist={entry.song.artist}
+                      album={entry.song.album}
+                      onPlay={() => handleSongPlay(entry.song)}
+                    />
                     <div className="absolute top-2 right-2 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded">
                       #{index + 1}
                     </div>

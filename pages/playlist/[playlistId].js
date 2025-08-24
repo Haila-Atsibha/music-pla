@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { FaArrowLeft, FaPlay, FaTrash } from "react-icons/fa";
 import MusicCard from "../Music";
 import BottomPlayerBar from "../../components/BottomPlayerBar";
+import Sidebar from "../../components/Sidebar";
 import { fetchPlaylists, deletePlaylist, removeSongFromPlaylist } from "../../lib/music-api";
 
 export default function PlaylistDetail() {
@@ -99,73 +100,72 @@ export default function PlaylistDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-[#24293E] pb-28">
-      {/* Header */}
-      <div className="bg-[#23263A] p-6 shadow-lg">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => router.push('/Main')}
-                className="text-[#8EBBFF] hover:text-[#F4F5FC] transition-colors"
-              >
-                <FaArrowLeft size={20} />
-              </button>
-              <div>
-                <h1 className="text-3xl font-bold text-[#F4F5FC]">{playlist.name}</h1>
-                {playlist.description && (
-                  <p className="text-[#8EBBFF] mt-1">{playlist.description}</p>
-                )}
-                <p className="text-[#CCCCCC] text-sm mt-1">
-                  {playlist.song_count || 0} song{(playlist.song_count || 0) !== 1 ? 's' : ''}
-                </p>
+    <div className="flex min-h-screen bg-[#24293E]">
+      <Sidebar />
+      <main className="flex-1 pl-56 bg-cover min-h-screen pb-28">
+        {/* Header */}
+        <div className="bg-[#23263A] p-6 shadow-lg">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => router.push('/Main')}
+                  className="text-[#8EBBFF] hover:text-[#F4F5FC] transition-colors"
+                >
+                  <FaArrowLeft size={20} />
+                </button>
+                <div>
+                  <h1 className="text-3xl font-bold text-[#F4F5FC]">{playlist.name}</h1>
+                  <p className="text-[#CCCCCC] text-sm mt-1">
+                    {playlist.song_count || 0} song{(playlist.song_count || 0) !== 1 ? 's' : ''}
+                  </p>
+                </div>
               </div>
+              <button
+                onClick={handleDeletePlaylist}
+                disabled={isDeleting}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+              >
+                <FaTrash size={16} />
+                {isDeleting ? 'Deleting...' : 'Delete Playlist'}
+              </button>
             </div>
-            <button
-              onClick={handleDeletePlaylist}
-              disabled={isDeleting}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center gap-2"
-            >
-              <FaTrash size={16} />
-              {isDeleting ? 'Deleting...' : 'Delete Playlist'}
-            </button>
           </div>
         </div>
-      </div>
 
-      {/* Songs */}
-      <div className="max-w-7xl mx-auto p-6">
-        {playlist.songs && playlist.songs.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {playlist.songs.map((song) => (
-              <div key={song.id} className="relative group">
-                <MusicCard
-                  id={song.id}
-                  src={song.storage_url}
-                  title={song.title}
-                  image={song.cover_url}
-                  artist={song.artist}
-                  album={song.album}
-                  onPlay={() => handleSongPlay(song)}
-                />
-                {/* Remove button overlay */}
-                <button
-                  onClick={() => handleRemoveSong(song.id)}
-                  className="absolute top-2 right-2 bg-red-600 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700"
-                >
-                  <FaTrash size={12} />
-                </button>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-16">
-            <div className="text-[#8EBBFF] text-xl mb-4">No songs in this playlist yet</div>
-            <p className="text-[#CCCCCC]">Add some songs to get started!</p>
-          </div>
-        )}
-      </div>
-
+        {/* Songs */}
+        <div className="max-w-7xl mx-auto p-6">
+          {playlist.songs && playlist.songs.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {playlist.songs.map((playlistSong) => (
+                <div key={playlistSong.id} className="relative group">
+                  <MusicCard
+                    id={playlistSong.song.id}
+                    src={playlistSong.song.storage_url}
+                    title={playlistSong.song.title}
+                    image={playlistSong.song.cover_url}
+                    artist={playlistSong.song.artist}
+                    album={playlistSong.song.album}
+                    onPlay={() => handleSongPlay(playlistSong.song)}
+                  />
+                  {/* Remove button overlay */}
+                  <button
+                    onClick={() => handleRemoveSong(playlistSong.song.id)}
+                    className="absolute top-2 right-2 bg-red-600 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700"
+                  >
+                    <FaTrash size={12} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-16">
+              <div className="text-[#8EBBFF] text-xl mb-4">No songs in this playlist yet</div>
+              <p className="text-[#CCCCCC]">Add some songs to get started!</p>
+            </div>
+          )}
+        </div>
+      </main>
       {/* Bottom Player Bar */}
       <BottomPlayerBar song={currentSong} artist={currentSong?.artist} />
     </div>

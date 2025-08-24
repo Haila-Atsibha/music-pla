@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { FaPlay, FaPause, FaStepForward, FaStepBackward, FaVolumeUp, FaRandom, FaRedo } from "react-icons/fa";
+import { trackSongPlay } from "../lib/music-api";
 
 export default function BottomPlayerBar({ song, artist }) {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -8,6 +9,7 @@ export default function BottomPlayerBar({ song, artist }) {
   const [volume, setVolume] = useState(1);
   const [isShuffling, setIsShuffling] = useState(false);
   const [isRepeating, setIsRepeating] = useState(false);
+  const [hasTrackedPlay, setHasTrackedPlay] = useState(false);
   const audioRef = useRef(null);
 
   // Handle song changes
@@ -15,26 +17,27 @@ export default function BottomPlayerBar({ song, artist }) {
     if (song && song.storage_url && audioRef.current) {
       // Reset current time when changing songs
       setCurrentTime(0);
+      setHasTrackedPlay(false);
       
       audioRef.current.src = song.storage_url;
       audioRef.current.load();
       
-      // Auto-play the new song if we were already playing
-      if (isPlaying) {
-        // Wait for the audio to be ready before playing
-        const handleCanPlay = () => {
-          audioRef.current.play().catch(error => {
-            console.error('Auto-play failed:', error);
-            // If auto-play fails, keep the player in playing state but don't start audio
-            // This is common in browsers that block auto-play
-          });
-          audioRef.current.removeEventListener('canplay', handleCanPlay);
-        };
-        
-        audioRef.current.addEventListener('canplay', handleCanPlay);
-      }
+      // Auto-play the new song immediately
+      setIsPlaying(true);
+      
+      // Wait for the audio to be ready before playing
+      const handleCanPlay = () => {
+        audioRef.current.play().catch(error => {
+          console.error('Auto-play failed:', error);
+          // If auto-play fails, keep the player in playing state but don't start audio
+          // This is common in browsers that block auto-play
+        });
+        audioRef.current.removeEventListener('canplay', handleCanPlay);
+      };
+      
+      audioRef.current.addEventListener('canplay', handleCanPlay);
     }
-  }, [song, isPlaying]);
+  }, [song]);
 
   // Handle play/pause
   useEffect(() => {
@@ -46,6 +49,14 @@ export default function BottomPlayerBar({ song, artist }) {
       }
     }
   }, [isPlaying]);
+
+  // Track play history when song starts playing
+  useEffect(() => {
+    if (isPlaying && song && !hasTrackedPlay) {
+      trackSongPlay(song.id);
+      setHasTrackedPlay(true);
+    }
+  }, [isPlaying, song, hasTrackedPlay]);
 
   // Audio event listeners
   useEffect(() => {

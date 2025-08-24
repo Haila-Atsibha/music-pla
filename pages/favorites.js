@@ -56,14 +56,16 @@ export default function FavoritesPage() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {songs.map((song) => (
-                <div key={song.id} onClick={() => handleSongPlay(song)}>
-                  <MusicCard
-                    id={song.id}
-                    src={song.storage_url}
-                    title={song.title}
-                    image={song.cover_url}
-                  />
-                </div>
+                <MusicCard
+                  key={song.id}
+                  id={song.id}
+                  src={song.storage_url}
+                  title={song.title}
+                  image={song.cover_url}
+                  artist={song.artist}
+                  album={song.album}
+                  onPlay={() => handleSongPlay(song)}
+                />
               ))}
             </div>
           )}
