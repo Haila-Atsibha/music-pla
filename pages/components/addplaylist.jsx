@@ -87,7 +87,7 @@ export default function Playlist({ songId }) {
       </button>
 
       {showPlaylistSelector && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-transparent bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-[#2A2F4F] p-6 rounded-xl flex flex-col gap-4 min-w-[350px] max-w-[450px] max-h-[80vh] overflow-hidden">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-bold text-[#F4F5FC]">

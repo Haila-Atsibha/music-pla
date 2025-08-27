@@ -2,10 +2,12 @@
 import Link from "next/link";
 import { FaSearch } from "react-icons/fa";
 import ImageCard from "./Card";
+import MusicCard from "./Music";
 
-export default function Homepage() {
+export default function Homepage({ songs, onSongPlay, searchQuery,setSearchQuery }) {
   return (
     <>
+
       <div className="bg-black bg-cover flex flex-col min-h-screen relative">
 
        
@@ -46,7 +48,7 @@ export default function Homepage() {
 
           
           <div className="flex flex-wrap justify-center gap-6 w-full">
-            <ImageCard className="bg-white/10 backdrop-blur-md shadow-lg hover:scale-105 transition-transform duration-300" />
+            
             <ImageCard className="bg-white/10 backdrop-blur-md shadow-lg hover:scale-105 transition-transform duration-300" />
           </div>
         </div>
@@ -57,12 +59,40 @@ export default function Homepage() {
               type="text"
               className="w-full h-[50px] rounded-2xl border-2 border-amber-50 bg-cyan-950 text-white pl-4 pr-12 placeholder-amber-100 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-1 transition-shadow duration-300"
               placeholder="Search..."
+             value={searchQuery} 
+             onChange={e => setSearchQuery(e.target.value)}
             />
             <button className="absolute right-3 top-1/2 -translate-y-1/2 text-white hover:text-amber-400 transition-colors duration-300">
               <FaSearch />
             </button>
           </div>
         </div>
+
+<div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  {(Array.isArray(songs) && songs.length > 0) ? (
+    songs.map((song) => (
+      <MusicCard
+        key={song.id}
+        id={song.id}
+        src={song.storage_url}
+        title={song.title}
+        image={song.cover_url}
+        artist={song.artist}
+        album={song.album}
+        onPlay={() => onSongPlay(song)}
+      />
+    ))
+  ) : (
+    <div className="text-[#8EBBFF] text-lg col-span-3 text-center">
+      {searchQuery ? `No songs found for "${searchQuery}"` : "Loading songs..."}
+    </div>
+  )}
+</div>
+<div className="flex justify-center items-center w-full">
+  <p className="text-[2.5rem] font-bold text-amber-50 max-w-2xl animate-fadeIn text-center">
+    <Link  href={"/login"} className="hover:text-amber-300 transition-colors duration-200">Login</Link> for more songs
+  </p>
+</div>
 
         <footer className="bg-cyan-950 text-white py-10 mt-16">
           <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8">

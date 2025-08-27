@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { FaPlay, FaPause, FaStepForward, FaStepBackward, FaVolumeUp, FaRandom, FaRedo } from "react-icons/fa";
 import { trackSongPlay } from "../lib/music-api";
 
-export default function BottomPlayerBar({ song, artist }) {
+export default function BottomPlayerBar({ song, artist,onClose }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -82,7 +82,7 @@ export default function BottomPlayerBar({ song, artist }) {
       audio.removeEventListener('ended', handleEnded);
       audio.removeEventListener('error', handleError);
     };
-  }, []);
+  }, [song]);
 
   const handleSeek = (e) => {
     const newTime = Number(e.target.value);
@@ -105,6 +105,14 @@ export default function BottomPlayerBar({ song, artist }) {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60).toString().padStart(2, "0");
     return `${minutes}:${seconds}`;
+  };
+
+  const handleClose = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+    if (onClose) onClose();
   };
 
   // Don't render if no song is selected
@@ -175,6 +183,13 @@ export default function BottomPlayerBar({ song, artist }) {
           className="accent-[#8EBBFF] w-24"
         />
       </div>
+       <button
+        onClick={handleClose}
+        className="ml-4 text-[#8EBBFF] hover:text-red-400 text-xl font-bold"
+        title="Close Player"
+      >
+        ✕
+      </button>
 
       {/* Hidden audio element */}
       <audio ref={audioRef} preload="metadata" />

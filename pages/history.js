@@ -100,7 +100,7 @@ export default function HistoryPage() {
           )}
         </div>
       </main>
-      <BottomPlayerBar song={currentSong} artist={currentSong?.artist} />
+      <BottomPlayerBar song={currentSong} artist={currentSong?.artist} onClose={() => setCurrentSong(null)} />
     </div>
   );
 }
