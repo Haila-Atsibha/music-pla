@@ -8,7 +8,7 @@ import { fetchSongs } from "../lib/music-api";
 
 export default function Homemain() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [currentSong, setCurrentSong] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(null);
   const [songs, setSongs] = useState([]);
   const [filteredSongs, setFilteredSongs] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -51,9 +51,11 @@ export default function Homemain() {
     // Search is handled by the useEffect above
   };
 
-  const handleSongPlay = (song) => {
-    setCurrentSong(song);
-  };
+ const handleSongPlay = (song) => {
+  const index = songs.findIndex(s => s.id === song.id);
+  if (index !== -1) setCurrentIndex(index);
+};
+
 
   return (
     <div className="flex min-h-screen bg-[#24293E]">
@@ -89,7 +91,15 @@ export default function Homemain() {
           )}
         </div>
       </main>
-      <BottomPlayerBar song={currentSong} artist={currentSong?.artist} onClose={() => setCurrentSong(null)} />
+{currentIndex !== null && (
+  <BottomPlayerBar
+    playlist={songs}                // <-- your fetched songs
+    currentIndex={currentIndex}     // <-- current song index
+    setCurrentIndex={setCurrentIndex}
+    artist={songs[currentIndex]?.artist}
+    onClose={() => setCurrentIndex(null)}
+  />
+)}
     </div>
   );
 }

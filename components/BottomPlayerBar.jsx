@@ -1,8 +1,22 @@
 import { useState, useEffect, useRef } from "react";
-import { FaPlay, FaPause, FaStepForward, FaStepBackward, FaVolumeUp, FaRandom, FaRedo } from "react-icons/fa";
+import {
+  FaPlay,
+  FaPause,
+  FaStepForward,
+  FaStepBackward,
+  FaVolumeUp,
+  FaRandom,
+  FaRedo,
+} from "react-icons/fa";
 import { trackSongPlay } from "../lib/music-api";
 
-export default function BottomPlayerBar({ song, artist,onClose }) {
+export default function BottomPlayerBar({
+  playlist,
+  currentIndex,
+  setCurrentIndex,
+  artist,
+  onClose,
+}) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -10,101 +24,146 @@ export default function BottomPlayerBar({ song, artist,onClose }) {
   const [isShuffling, setIsShuffling] = useState(false);
   const [isRepeating, setIsRepeating] = useState(false);
   const [hasTrackedPlay, setHasTrackedPlay] = useState(false);
+  const [history, setHistory] = useState([]);
   const audioRef = useRef(null);
 
-  // Handle song changes
-  useEffect(() => {
-    if (song && song.storage_url && audioRef.current) {
-      // Reset current time when changing songs
-      setCurrentTime(0);
-      setHasTrackedPlay(false);
-      
-      audioRef.current.src = song.storage_url;
-      audioRef.current.load();
-      
-      // Auto-play the new song immediately
-      setIsPlaying(true);
-      
-      // Wait for the audio to be ready before playing
-      const handleCanPlay = () => {
-        audioRef.current.play().catch(error => {
-          console.error('Auto-play failed:', error);
-          // If auto-play fails, keep the player in playing state but don't start audio
-          // This is common in browsers that block auto-play
-        });
-        audioRef.current.removeEventListener('canplay', handleCanPlay);
-      };
-      
-      audioRef.current.addEventListener('canplay', handleCanPlay);
-    }
-  }, [song]);
+  const currentSong = playlist?.[currentIndex] || null;
 
-  // Handle play/pause
+  // Handle song changes and autoplay
   useEffect(() => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.play();
-      } else {
-        audioRef.current.pause();
-      }
-    }
+    if (!currentSong?.storage_url || !audioRef.current) return;
+
+    const audio = audioRef.current;
+
+    // Add to history (for previous button)
+    setHistory((prev) => [...prev, currentIndex]);
+
+    audio.pause();
+    audio.currentTime = 0;
+    audio.src = currentSong.storage_url;
+    audio.load();
+
+    setCurrentTime(0);
+    setHasTrackedPlay(false);
+    setIsPlaying(true);
+
+    audio
+      .play()
+      .catch((err) => console.error("Auto-play failed:", err));
+  }, [currentIndex, currentSong]);
+
+  // Play/pause effect
+  useEffect(() => {
+    if (!audioRef.current) return;
+    if (isPlaying) audioRef.current.play().catch(console.error);
+    else audioRef.current.pause();
   }, [isPlaying]);
 
-  // Track play history when song starts playing
+  // Track play history
   useEffect(() => {
-    if (isPlaying && song && !hasTrackedPlay) {
-      trackSongPlay(song.id);
+    if (isPlaying && currentSong && !hasTrackedPlay) {
+      trackSongPlay(currentSong.id);
       setHasTrackedPlay(true);
     }
-  }, [isPlaying, song, hasTrackedPlay]);
+  }, [isPlaying, currentSong, hasTrackedPlay]);
 
-  // Audio event listeners
+  // Audio events
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
     const updateTime = () => setCurrentTime(audio.currentTime);
     const updateDuration = () => setDuration(audio.duration);
-    const handleEnded = () => setIsPlaying(false);
+    const handleEnded = () => {
+      if (isRepeating) {
+        audio.currentTime = 0;
+        audio.play();
+      } else {
+        handleNext();
+      }
+    };
     const handleError = (e) => {
-      console.error('Audio error:', e);
+      console.error("Audio error:", e);
       setIsPlaying(false);
     };
 
-    audio.addEventListener('timeupdate', updateTime);
-    audio.addEventListener('loadedmetadata', updateDuration);
-    audio.addEventListener('ended', handleEnded);
-    audio.addEventListener('error', handleError);
+    audio.addEventListener("timeupdate", updateTime);
+    audio.addEventListener("loadedmetadata", updateDuration);
+    audio.addEventListener("ended", handleEnded);
+    audio.addEventListener("error", handleError);
 
     return () => {
-      audio.removeEventListener('timeupdate', updateTime);
-      audio.removeEventListener('loadedmetadata', updateDuration);
-      audio.removeEventListener('ended', handleEnded);
-      audio.removeEventListener('error', handleError);
+      audio.removeEventListener("timeupdate", updateTime);
+      audio.removeEventListener("loadedmetadata", updateDuration);
+      audio.removeEventListener("ended", handleEnded);
+      audio.removeEventListener("error", handleError);
     };
-  }, [song]);
+  }, [currentSong, isRepeating]);
 
+  // Seek & volume
   const handleSeek = (e) => {
     const newTime = Number(e.target.value);
     setCurrentTime(newTime);
-    if (audioRef.current) {
-      audioRef.current.currentTime = newTime;
-    }
+    if (audioRef.current) audioRef.current.currentTime = newTime;
   };
 
   const handleVolumeChange = (e) => {
     const newVolume = Number(e.target.value);
     setVolume(newVolume);
-    if (audioRef.current) {
-      audioRef.current.volume = newVolume;
+    if (audioRef.current) audioRef.current.volume = newVolume;
+  };
+
+  // Next / Previous
+  const handleNext = () => {
+    if (!playlist || playlist.length === 0) return;
+
+    if (isShuffling && !isRepeating) {
+      let nextIndex;
+      do {
+        nextIndex = Math.floor(Math.random() * playlist.length);
+      } while (nextIndex === currentIndex && playlist.length > 1);
+      setCurrentIndex(nextIndex);
+    } else {
+      setCurrentIndex((prev) => (prev + 1) % playlist.length);
     }
   };
 
-  const formatTime = (time) => {
-    if (isNaN(time)) return "0:00";
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60).toString().padStart(2, "0");
-    return `${minutes}:${seconds}`;
+ const handlePrevious = () => {
+  if (history.length > 1) {
+    // Normal history back
+    const newHistory = [...history];
+    newHistory.pop(); // remove current
+    const prevIndex = newHistory.pop(); // get previous
+    if (prevIndex != null) {
+      setCurrentIndex(prevIndex);
+      setHistory([...newHistory, prevIndex]);
+    }
+  } else {
+    // History empty or first song: pick a random one
+    if (!playlist || playlist.length === 0) return;
+    let randomIndex;
+    do {
+      randomIndex = Math.floor(Math.random() * playlist.length);
+    } while (randomIndex === currentIndex && playlist.length > 1);
+    setCurrentIndex(randomIndex);
+    setHistory([randomIndex]); // start a new history
+  }
+};
+
+
+  // Toggle buttons (mutually exclusive)
+  const toggleShuffle = () => {
+    setIsShuffling((prev) => {
+      if (!prev) setIsRepeating(false);
+      return !prev;
+    });
+  };
+
+  const toggleRepeat = () => {
+    setIsRepeating((prev) => {
+      if (!prev) setIsShuffling(false);
+      return !prev;
+    });
   };
 
   const handleClose = () => {
@@ -115,45 +174,61 @@ export default function BottomPlayerBar({ song, artist,onClose }) {
     if (onClose) onClose();
   };
 
-  // Don't render if no song is selected
-  if (!song) return null;
+  if (!currentSong) return null;
+
+  const formatTime = (time) => {
+    if (isNaN(time)) return "0:00";
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60)
+      .toString()
+      .padStart(2, "0");
+    return `${minutes}:${seconds}`;
+  };
 
   return (
     <div className="fixed bottom-0 left-0 w-full bg-[#23263A] text-[#F4F5FC] shadow-2xl z-50 flex items-center justify-between px-8 py-3">
       {/* Song Info */}
       <div className="flex items-center gap-4 min-w-[200px]">
         <div className="w-14 h-14 bg-[#2A2F4F] rounded-lg overflow-hidden flex-shrink-0">
-          {/* Album art */}
-          <img src={song?.cover_url || song?.image || "/file.svg"} alt={song?.title || "Song"} className="w-full h-full object-cover" />
+          <img
+            src={currentSong?.cover_url || currentSong?.image || "/file.svg"}
+            alt={currentSong?.title || "Song"}
+            className="w-full h-full object-cover"
+          />
         </div>
         <div>
-          <div className="font-semibold text-base truncate max-w-[120px]">{song?.title || "Song Title"}</div>
-          <div className="text-xs text-[#8EBBFF] truncate max-w-[120px]">{artist || song?.artist || "Artist Name"}</div>
+          <div className="font-semibold text-base truncate max-w-[120px]">
+            {currentSong?.title || "Song Title"}
+          </div>
+          <div className="text-xs text-[#8EBBFF] truncate max-w-[120px]">
+            {artist || currentSong?.artist || "Artist Name"}
+          </div>
         </div>
       </div>
 
       {/* Controls */}
       <div className="flex flex-col items-center flex-1 max-w-xl">
         <div className="flex items-center gap-6 mb-1">
-          <button onClick={() => setIsShuffling((s) => !s)} className={isShuffling ? "text-[#8EBBFF]" : ""}>
+          <button onClick={toggleShuffle} className={` cursor-pointer ${isShuffling ? "text-[#8EBBFF]" : ""}`}>
             <FaRandom size={18} />
           </button>
-          <button>
+          <button onClick={handlePrevious} className="cursor-pointer">
             <FaStepBackward size={22} />
           </button>
           <button
             onClick={() => setIsPlaying((p) => !p)}
-            className="bg-[#8EBBFF] hover:bg-[#6FAFFF] text-[#23263A] w-12 h-12 rounded-full flex items-center justify-center"
+            className="bg-[#8EBBFF] cursor-pointer hover:bg-[#6FAFFF] text-[#23263A] w-12 h-12 rounded-full flex items-center justify-center"
           >
             {isPlaying ? <FaPause size={24} /> : <FaPlay size={24} />}
           </button>
-          <button>
+          <button onClick={handleNext} className="cursor-pointer">
             <FaStepForward size={22} />
           </button>
-          <button onClick={() => setIsRepeating((r) => !r)} className={isRepeating ? "text-[#8EBBFF]" : ""}>
+          <button onClick={toggleRepeat} className={`cursor-pointer ${isRepeating ? "text-[#8EBBFF]" : ""}`}>
             <FaRedo size={18} />
           </button>
         </div>
+
         {/* Seek Bar */}
         <div className="flex items-center gap-2 w-full max-w-md">
           <span className="text-xs w-10 text-right">{formatTime(currentTime)}</span>
@@ -164,7 +239,7 @@ export default function BottomPlayerBar({ song, artist,onClose }) {
             step="0.1"
             value={currentTime}
             onChange={handleSeek}
-            className="flex-1 accent-[#8EBBFF] h-1"
+            className="flex-1 cursor-pointer accent-[#8EBBFF] h-1"
           />
           <span className="text-xs w-10">{formatTime(duration)}</span>
         </div>
@@ -180,18 +255,18 @@ export default function BottomPlayerBar({ song, artist,onClose }) {
           step="0.01"
           value={volume}
           onChange={handleVolumeChange}
-          className="accent-[#8EBBFF] w-24"
+          className="accent-[#8EBBFF] w-24 cursor-pointer"
         />
       </div>
-       <button
+
+      <button
         onClick={handleClose}
-        className="ml-4 text-[#8EBBFF] hover:text-red-400 text-xl font-bold"
+        className="ml-4 cursor-pointer text-[#8EBBFF] hover:text-red-400 text-xl font-bold"
         title="Close Player"
       >
         ✕
       </button>
 
-      {/* Hidden audio element */}
       <audio ref={audioRef} preload="metadata" />
     </div>
   );
