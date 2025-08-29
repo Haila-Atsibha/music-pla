@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -33,7 +32,7 @@ model Song {
   album        String?
   cover_url    String?
   storage_url  String
-  uploaded_by  String
+  uploaded_by  String        @db.Uuid
   uploaded_at  DateTime      @default(now()) @db.Timestamptz(6)
   uploadedBy   User          @relation("UploadedSongs", fields: [uploaded_by], references: [id])
   playlists    PlaylistSong[]
@@ -46,7 +45,7 @@ model Song {
 model Playlist {
   id         String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name       String
-  owner_id   String
+  owner_id   String         @db.Uuid
   created_at DateTime       @default(now()) @db.Timestamptz(6)
   owner      User           @relation(fields: [owner_id], references: [id])
   songs      PlaylistSong[]

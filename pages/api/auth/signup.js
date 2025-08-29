@@ -1,11 +1,11 @@
-const { createClient } = require('@supabase/supabase-js')
-const prisma = require('../../../lib/prisma')
+import { createClient } from '@supabase/supabase-js'
+import prisma from '../../../lib/prisma'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-async function handler(req, res) {
+export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
@@ -35,6 +35,8 @@ async function handler(req, res) {
   }
 
   try {
+    console.log('Starting registration for:', email)
+    
     // 1. Create user in Supabase Auth
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email: email.toLowerCase().trim(),
@@ -54,7 +56,7 @@ async function handler(req, res) {
       return res.status(400).json({ error: authError.message })
     }
 
-    console.log('Supabase authData:', authData)
+    console.log('Supabase registration successful:', authData.user?.id)
 
     // 2. Create user in Prisma database
     if (authData.user) {
@@ -69,7 +71,7 @@ async function handler(req, res) {
             role: 'user'
           }
         })
-        console.log('Prisma created user:', dbUser)
+        console.log('Database user created successfully:', dbUser.id)
       } catch (dbError) {
         console.error('Prisma user creation error:', dbError)
         if (dbError.code === 'P2002') {
@@ -95,5 +97,3 @@ async function handler(req, res) {
     return res.status(500).json({ error: 'Unexpected error: ' + error.message })
   }
 }
-
-export default handler
