@@ -1,34 +1,55 @@
+// pages/favorites.js
 import { useState, useEffect } from "react";
 import MusicCard from "./Music";
-import { supabase } from "../lib/supabase";
 import Sidebar from "../components/Sidebar";
 import BottomPlayerBar from "../components/BottomPlayerBar";
 import { FaHeart } from "react-icons/fa";
+import Liked from "./components/Liked";
+import { supabase } from "../lib/supabase";
 
 export default function FavoritesPage() {
   const [songs, setSongs] = useState([]);
   const [currentSong, setCurrentSong] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // ✅ Fetch all liked songs
+  const fetchFavorites = async () => {
+    setLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("You must be logged in");
+
+      const res = await fetch("/api/favorites", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`, // 👈 required for auth
+        },
+      });
+
+      if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
+      const data = await res.json();
+      setSongs(data);
+    } catch (err) {
+      console.error("Error fetching favorites:", err);
+      setError("Failed to load favorites. Make sure you are logged in.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchFavorites = async () => {
-      const favoriteIds = JSON.parse(localStorage.getItem("favorites") || "[]");
-      if (favoriteIds.length === 0) return setSongs([]);
-
-      const { data, error } = await supabase
-        .from("songs")
-        .select("*")
-        .in("id", favoriteIds);
-
-      if (error) console.log(error);
-      else setSongs(data);
-    };
-
     fetchFavorites();
   }, []);
 
-  const handleSongPlay = (song) => {
-    setCurrentSong(song);
-  };
+  const handleSongPlay = (song) => setCurrentSong(song);
+
+  // Refresh favorites when a song is liked/unliked
+
+const handleLikeChange = () => {
+  fetchFavorites(); // re-fetch favorites list
+};
+
 
   return (
     <div className="flex min-h-screen bg-[#24293E]">
@@ -42,12 +63,16 @@ export default function FavoritesPage() {
             </h1>
             {songs.length > 0 && (
               <div className="text-[#8EBBFF]">
-                {songs.length} favorite{songs.length !== 1 ? 's' : ''}
+                {songs.length} favorite{songs.length !== 1 ? "s" : ""}
               </div>
             )}
           </div>
 
-          {songs.length === 0 ? (
+          {loading ? (
+            <p className="text-[#F4F5FC]">Loading favorites...</p>
+          ) : error ? (
+            <p className="text-red-500">{error}</p>
+          ) : songs.length === 0 ? (
             <div className="text-center py-16">
               <FaHeart className="text-6xl text-gray-400 mx-auto mb-4" />
               <p className="text-xl text-[#F4F5FC] mb-2">No favorite songs yet</p>
@@ -65,13 +90,19 @@ export default function FavoritesPage() {
                   artist={song.artist}
                   album={song.album}
                   onPlay={() => handleSongPlay(song)}
-                />
+                >
+                  <Liked songId={song.id} onChange={handleLikeChange} />
+                </MusicCard>
               ))}
             </div>
           )}
         </div>
       </main>
-      <BottomPlayerBar song={currentSong} artist={currentSong?.artist} onClose={() => setCurrentSong(null)} />
+      <BottomPlayerBar
+        song={currentSong}
+        artist={currentSong?.artist}
+        onClose={() => setCurrentSong(null)}
+      />
     </div>
   );
 }

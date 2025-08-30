@@ -8,13 +8,11 @@ async function handler(req, res) {
   }
 
   try {
-    // req.user is injected by requireAuth middleware
     const userId = req.user?.id;
     if (!userId) {
       return res.status(401).json({ error: "Unauthorized", code: "UNAUTHORIZED" });
     }
 
-    // Fetch all likes for this user, including song details
     const favorites = await prisma.userLike.findMany({
       where: { user_id: userId },
       include: {
@@ -29,10 +27,9 @@ async function handler(req, res) {
           },
         },
       },
-      orderBy: { liked_at: "desc" }, // newest liked first
+      orderBy: { liked_at: "desc" },
     });
 
-    // Transform data to just return the song info
     const favoriteSongs = favorites.map((like) => like.song);
 
     return res.status(200).json(favoriteSongs);

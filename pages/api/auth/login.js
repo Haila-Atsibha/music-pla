@@ -30,7 +30,6 @@ async function handler(req, res) {
     if (authError) {
       console.error('Login error:', authError)
       
-      // Handle specific error cases
       if (authError.message.toLowerCase().includes('invalid login credentials')) {
         return res.status(401).json({ 
           error: 'Invalid email or password',
@@ -48,8 +47,8 @@ async function handler(req, res) {
       return res.status(400).json({ error: authError.message })
     }
 
-    // 2. Get additional user data from our database
-    const user = await prisma.user.findUnique({
+    // 2. Try to get the user from Prisma by auth_uid
+    let user = await prisma.user.findUnique({
       where: { auth_uid: authData.user.id },
       select: {
         id: true,
@@ -60,18 +59,40 @@ async function handler(req, res) {
       }
     })
 
+    // 3. If not found, try by email (fallback)
     if (!user) {
-      console.error('User not found in database:', authData.user.id)
+      console.warn('User not found by auth_uid, checking by email:', authData.user.email)
+
+      const existingByEmail = await prisma.user.findUnique({
+        where: { email: authData.user.email.toLowerCase().trim() }
+      })
+
+      if (existingByEmail) {
+        // Update with the correct auth_uid
+        user = await prisma.user.update({
+          where: { email: existingByEmail.email },
+          data: { auth_uid: authData.user.id },
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            role: true,
+            created_at: true
+          }
+        })
+        console.log('User record updated with new auth_uid:', user.id)
+      }
+    }
+
+    if (!user) {
+      console.error('User not found in database (even by email):', authData.user.id)
       return res.status(500).json({ error: 'User data not found' })
     }
 
-    // 3. Return success response with user data
+    // 4. Return success response with user data + session
     return res.status(200).json({
       success: true,
-      user: {
-        ...user,
-        // Include any additional user data you want to expose to the frontend
-      },
+      user,
       session: {
         access_token: authData.session.access_token,
         refresh_token: authData.session.refresh_token,
@@ -82,7 +103,6 @@ async function handler(req, res) {
   } catch (error) {
     console.error('Login error:', error)
     
-    // Handle Prisma errors
     if (error.code === 'P2025') {
       return res.status(404).json({ 
         error: 'User data not found',
@@ -90,7 +110,6 @@ async function handler(req, res) {
       })
     }
     
-
     return res.status(500).json({ 
       error: 'An unexpected error occurred. Please try again.',
       details: process.env.NODE_ENV === 'development' ? error.message : undefined
