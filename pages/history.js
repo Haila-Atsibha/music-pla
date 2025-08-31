@@ -7,7 +7,7 @@ import { fetchHistory } from "../lib/music-api";
 
 export default function HistoryPage() {
   const [history, setHistory] = useState([]);
-  const [currentSong, setCurrentSong] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -30,9 +30,11 @@ export default function HistoryPage() {
     }
   };
 
-  const handleSongPlay = (song) => {
-    setCurrentSong(song);
-  };
+const handleSongPlay = (song) => {
+  const index = history.findIndex(entry => entry.song.id === song.id);
+  if (index !== -1) setCurrentIndex(index);
+};
+
 
   const clearHistory = () => {
     if (confirm("Are you sure you want to clear your listening history?")) {
@@ -100,7 +102,15 @@ export default function HistoryPage() {
           )}
         </div>
       </main>
-      <BottomPlayerBar song={currentSong} artist={currentSong?.artist} onClose={() => setCurrentSong(null)} />
-    </div>
+{currentIndex !== null && (
+  <BottomPlayerBar
+    playlist={history.map(entry => entry.song)}   // ✅ use songs from history
+    currentIndex={currentIndex}
+    setCurrentIndex={setCurrentIndex}
+    artist={history[currentIndex]?.song.artist}
+    onClose={() => setCurrentIndex(null)}
+  />
+)}
+  </div>
   );
 }

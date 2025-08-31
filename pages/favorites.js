@@ -9,7 +9,7 @@ import { supabase } from "../lib/supabase";
 
 export default function FavoritesPage() {
   const [songs, setSongs] = useState([]);
-  const [currentSong, setCurrentSong] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -42,8 +42,10 @@ export default function FavoritesPage() {
     fetchFavorites();
   }, []);
 
-  const handleSongPlay = (song) => setCurrentSong(song);
-
+const handleSongPlay = (song) => {
+  const index = songs.findIndex(s => s.id === song.id);
+  if (index !== -1) setCurrentIndex(index);
+};
   // Refresh favorites when a song is liked/unliked
 
 const handleLikeChange = () => {
@@ -98,11 +100,15 @@ const handleLikeChange = () => {
           )}
         </div>
       </main>
-      <BottomPlayerBar
-        song={currentSong}
-        artist={currentSong?.artist}
-        onClose={() => setCurrentSong(null)}
-      />
+    {currentIndex !== null && (
+  <BottomPlayerBar
+    playlist={songs}
+    currentIndex={currentIndex}
+    setCurrentIndex={setCurrentIndex}
+    artist={songs[currentIndex]?.artist}
+    onClose={() => setCurrentIndex(null)}
+  />
+)}
     </div>
   );
 }

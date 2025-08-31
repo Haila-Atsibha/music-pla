@@ -2,6 +2,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { FaMusic, FaHeart, FaList, FaHistory, FaPlus, FaTrash } from "react-icons/fa";
 import { fetchPlaylists, createPlaylist, deletePlaylist } from "../lib/music-api";
+import LogoutButton from "./ui/LogoutButton";
 
 export default function Sidebar() {
   const [playlists, setPlaylists] = useState([]);
@@ -78,6 +79,7 @@ export default function Sidebar() {
         <Link href="/history" className="flex items-center gap-3 text-lg hover:text-[#8EBBFF] transition">
           <FaHistory /> History
         </Link>
+        
         
         {/* Playlists Section */}
         <div className="border-t border-[#3A3F5F] pt-4">
@@ -168,6 +170,7 @@ export default function Sidebar() {
             )}
           </div>
         </div>
+                <LogoutButton />
       </nav>
     </aside>
   );

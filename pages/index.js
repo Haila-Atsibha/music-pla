@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
-    const [currentSong, setCurrentSong] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(null);
     const [songs, setSongs] = useState([]);
     const [filteredSongs, setFilteredSongs] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -62,15 +62,23 @@ export default function Home() {
       // Search is handled by the useEffect above
     };
   
-    const handleSongPlay = (song) => {
-      setCurrentSong(song);
-    };
+   const handleSongPlay = (song) => {
+  const index = filteredSongs.findIndex(s => s.id === song.id);
+  if (index !== -1) setCurrentIndex(index);
+};
 
   return (
     <>
 <Homepage songs={filteredSongs.slice(0,3)} onSongPlay={handleSongPlay} searchQuery={searchQuery} setSearchQuery={setSearchQuery} /> 
-      <BottomPlayerBar song={currentSong} artist={currentSong?.artist} onClose={() => setCurrentSong(null)} />
-
+    {currentIndex !== null && (
+  <BottomPlayerBar
+    playlist={filteredSongs}
+    currentIndex={currentIndex}
+    setCurrentIndex={setCurrentIndex}
+    artist={filteredSongs[currentIndex]?.artist}
+    onClose={() => setCurrentIndex(null)}
+  />
+)}
 </>
  );
 
