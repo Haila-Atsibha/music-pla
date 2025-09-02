@@ -11,8 +11,16 @@ export default function Liked({ songId, onChange }) {
   useEffect(() => {
     const fetchLikeStatus = async () => {
       try {
+        console.log('💖 Liked Component Debug - Fetching like status for song:', songId);
         const { data: { session } } = await supabase.auth.getSession();
-        if (!session) return;
+
+        if (!session) {
+          console.log('💖 Liked Component Debug - No session found');
+          return;
+        }
+
+        console.log('💖 Liked Component Debug - Session found, user:', session.user?.id);
+        console.log('💖 Liked Component Debug - Token length:', session.access_token?.length);
 
         const res = await fetch(`/api/songs/${songId}/like-status`, {
           method: "GET",
@@ -21,11 +29,19 @@ export default function Liked({ songId, onChange }) {
           },
         });
 
-        if (!res.ok) throw new Error("Failed to fetch like status");
+        console.log('💖 Liked Component Debug - Response status:', res.status);
+
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => ({ error: 'Unknown error' }));
+          console.error('💖 Liked Component Debug - API Error:', errorData);
+          throw new Error(`Failed to fetch like status: ${res.status} - ${errorData.error || 'Unknown error'}`);
+        }
+
         const data = await res.json();
+        console.log('💖 Liked Component Debug - Success, user_liked:', data.user_liked);
         setLiked(data.user_liked);
       } catch (err) {
-        console.error("Error fetching like status:", err);
+        console.error("💖 Liked Component Debug - Error fetching like status:", err);
       }
     };
 

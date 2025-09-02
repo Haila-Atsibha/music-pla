@@ -8,10 +8,14 @@ export default async function handler(req, res) {
 
   const response = {
     ok: true,
+    timestamp: new Date().toISOString(),
     env: {
+      NODE_ENV: process.env.NODE_ENV,
       DATABASE_URL_SET: Boolean(databaseUrl),
       NEXT_PUBLIC_SUPABASE_URL_SET: Boolean(supabaseUrl),
       NEXT_PUBLIC_SUPABASE_ANON_KEY_SET: Boolean(supabaseAnon),
+      SUPABASE_URL_VALUE: supabaseUrl ? supabaseUrl.substring(0, 30) + '...' : 'NOT_SET',
+      SUPABASE_KEY_LENGTH: supabaseAnon ? supabaseAnon.length : 0,
     },
     database: {
       host: null,
